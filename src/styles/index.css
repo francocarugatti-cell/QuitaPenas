@@ -49,8 +49,10 @@ html, body {
 }
 
 /* ===== Layout con sidebar ===== */
+/* Móvil: menú arriba y contenido abajo (apilados en columna). */
 .layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
@@ -948,6 +950,11 @@ html, body {
 
 /* En pantallas medianas/grandes el menú pasa a columna lateral. */
 @media (min-width: 820px) {
+  /* El layout vuelve a fila: menú a la izquierda, contenido a la derecha. */
+  .layout {
+    flex-direction: row;
+  }
+
   .sidebar {
     width: 230px;
     min-height: 100vh;
