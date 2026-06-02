@@ -9,6 +9,7 @@ import ProductManager from './components/ProductManager.jsx'
 import Toast from './components/Toast.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import SetupNotice from './components/SetupNotice.jsx'
+import Login from './components/Login.jsx'
 import { useCollection } from './hooks/useCollection.js'
 import { supabase, supabaseConfigurado } from './lib/supabase.js'
 import { todayKey, dateKey, formatFechaLarga, formatMoney } from './utils/format.js'
@@ -21,15 +22,42 @@ const TITULOS = {
   resumen: 'Resumen y reportes',
 }
 
+const CLAVE_SESION = 'qp_sesion'
+
 export default function App() {
+  // Estado de sesión, recordado en el navegador.
+  const [autenticado, setAutenticado] = useState(
+    () => window.localStorage.getItem(CLAVE_SESION) === '1',
+  )
+
   // Si todavía no se conectó la base de datos, mostramos las instrucciones.
   if (!supabaseConfigurado) {
     return <SetupNotice />
   }
-  return <AppConectada />
+
+  // Si no inició sesión, mostramos la pantalla de acceso.
+  if (!autenticado) {
+    return (
+      <Login
+        onLogin={() => {
+          window.localStorage.setItem(CLAVE_SESION, '1')
+          setAutenticado(true)
+        }}
+      />
+    )
+  }
+
+  return (
+    <AppConectada
+      onLogout={() => {
+        window.localStorage.removeItem(CLAVE_SESION)
+        setAutenticado(false)
+      }}
+    />
+  )
 }
 
-function AppConectada() {
+function AppConectada({ onLogout }) {
   // Datos en la nube, sincronizados en tiempo real entre dispositivos.
   const { rows: ventas, recargar: recargarVentas } = useCollection('ventas', {
     columna: 'fecha',
@@ -105,7 +133,7 @@ function AppConectada() {
 
   return (
     <div className="layout">
-      <Sidebar vista={vista} setVista={setVista} />
+      <Sidebar vista={vista} setVista={setVista} onLogout={onLogout} />
 
       <main className="main">
         <div className="topbar">

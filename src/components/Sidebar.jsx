@@ -8,8 +8,9 @@ const ITEMS = [
 /**
  * @param {string} vista     Vista activa actual.
  * @param {Function} setVista Cambia la vista activa.
+ * @param {Function} onLogout Cierra la sesión.
  */
-export default function Sidebar({ vista, setVista }) {
+export default function Sidebar({ vista, setVista, onLogout }) {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -30,6 +31,11 @@ export default function Sidebar({ vista, setVista }) {
           </button>
         ))}
       </nav>
+
+      <button className="sidebar__logout" onClick={onLogout}>
+        <span aria-hidden="true">🚪</span>
+        <span>Cerrar sesión</span>
+      </button>
     </aside>
   )
 }
