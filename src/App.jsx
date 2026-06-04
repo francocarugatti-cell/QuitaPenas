@@ -88,25 +88,28 @@ function AppConectada({ onLogout }) {
   }
 
   // ----- Operaciones sobre ventas -----
-  async function registrarVenta(venta) {
-    const { error } = await supabase.from('ventas').insert(venta)
+  // Registra un cliente completo: una o varias filas que comparten cliente_id.
+  async function registrarVenta(filas) {
+    const { error } = await supabase.from('ventas').insert(filas)
     if (error) {
-      mostrarToast('❌ No se pudo registrar la venta', 'error')
+      mostrarToast('❌ No se pudo registrar el cliente', 'error')
       return
     }
     await recargarVentas()
-    mostrarToast('✅ Venta registrada correctamente')
+    mostrarToast('✅ Cliente registrado correctamente')
   }
 
+  // Elimina todos los productos del cliente seleccionado.
   async function confirmarEliminar() {
-    const { error } = await supabase.from('ventas').delete().eq('id', aEliminar)
+    const ids = aEliminar.items.map((v) => v.id)
+    const { error } = await supabase.from('ventas').delete().in('id', ids)
     setAEliminar(null)
     if (error) {
       mostrarToast('❌ No se pudo eliminar', 'error')
       return
     }
     await recargarVentas()
-    mostrarToast('🗑️ Venta eliminada', 'error')
+    mostrarToast('🗑️ Cliente eliminado', 'error')
   }
 
   // ----- Operaciones sobre productos -----
@@ -152,8 +155,8 @@ function AppConectada({ onLogout }) {
             <>
               <SaleForm productos={productos} onRegistrar={registrarVenta} />
               <section>
-                <h2 className="seccion__titulo">🧾 Ventas de hoy</h2>
-                <SalesTable ventas={ventasHoy} onEliminar={(id) => setAEliminar(id)} />
+                <h2 className="seccion__titulo">🧾 Clientes de hoy</h2>
+                <SalesTable ventas={ventasHoy} onEliminar={(cliente) => setAEliminar(cliente)} />
               </section>
             </>
           )}
@@ -189,7 +192,7 @@ function AppConectada({ onLogout }) {
 
       {aEliminar && (
         <ConfirmDialog
-          mensaje="¿Seguro que querés eliminar esta venta? Esta acción no se puede deshacer."
+          mensaje={`¿Seguro que querés eliminar al Cliente ${aEliminar.numero} y sus ${aEliminar.items.length} producto${aEliminar.items.length === 1 ? '' : 's'}? Esta acción no se puede deshacer.`}
           onConfirmar={confirmarEliminar}
           onCancelar={() => setAEliminar(null)}
         />

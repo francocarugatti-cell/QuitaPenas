@@ -2,7 +2,7 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatMoney, formatHora, formatFechaLarga } from './format.js'
-import { calcularResumen } from './resumen.js'
+import { calcularResumen, agruparPorCliente } from './resumen.js'
 
 /**
  * Genera y descarga un PDF con el reporte del día indicado.
@@ -37,19 +37,18 @@ export function descargarPDF(ventas, clave) {
   doc.setTextColor(60, 40, 25)
   const lineas = [
     `Total del día: ${formatMoney(r.total)}`,
-    `Efectivo: ${formatMoney(r.efectivo)}  (${r.efectivoCount} transacciones)`,
-    `Mercado Pago: ${formatMoney(r.mercadoPago)}  (${r.mercadoPagoCount} transacciones)`,
+    `Clientes del día: ${r.clientes}  (${r.productosVendidos} productos)`,
+    `Efectivo: ${formatMoney(r.efectivo)}  (${r.efectivoCount} clientes)`,
+    `Mercado Pago: ${formatMoney(r.mercadoPago)}  (${r.mercadoPagoCount} clientes)`,
     `Producto más vendido: ${r.productoTop || '—'}${r.productoTop ? ` (${r.productoTopUnidades} unidades)` : ''}`,
-    `Total de transacciones: ${r.transacciones}`,
   ]
   lineas.forEach((linea, i) => doc.text(linea, margen, 124 + i * 18))
 
-  // --- Tabla de ventas ---
-  const ordenadas = [...ventas].sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-  autoTable(doc, {
-    startY: 230,
-    head: [['Hora', 'Producto', 'Cant.', 'Precio', 'Total', 'Pago']],
-    body: ordenadas.map((v) => [
+  // --- Tabla de ventas (agrupada por cliente) ---
+  const clientes = agruparPorCliente(ventas)
+  const filas = clientes.flatMap((cliente) =>
+    cliente.items.map((v) => [
+      `Cliente ${cliente.numero}`,
       formatHora(v.fecha),
       v.producto,
       String(v.cantidad),
@@ -57,6 +56,11 @@ export function descargarPDF(ventas, clave) {
       formatMoney(v.total),
       v.metodo,
     ]),
+  )
+  autoTable(doc, {
+    startY: 230,
+    head: [['Cliente', 'Hora', 'Producto', 'Cant.', 'Precio', 'Total', 'Pago']],
+    body: filas,
     styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
     headStyles: { fillColor: [74, 44, 24], textColor: 255 },
     alternateRowStyles: { fillColor: [253, 238, 221] },

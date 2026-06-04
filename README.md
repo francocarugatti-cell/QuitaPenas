@@ -6,10 +6,13 @@ pastelería **Quita Penas**. Funciona en celular y en computadora, con los datos
 
 ## Características
 
-- **Registro de ventas**: producto, cantidad, precio, método de pago y fecha/hora.
+- **Registro por cliente**: cargá varios productos a un mismo cliente (ticket) y
+  confirmalos juntos, con método de pago y fecha/hora.
+- **Ventas agrupadas por cliente**: cada cliente se numera (Cliente 1, 2, 3…) y se
+  ven sus productos juntos, así sabés **cuántos clientes entraron en el día**.
 - **Productos editables**: agregar, editar precio y borrar productos desde la app.
 - **Precio automático** al elegir el producto (editable en cada venta).
-- **Resumen del día**: total, efectivo, Mercado Pago, producto más vendido y nº de transacciones.
+- **Resumen del día**: total, efectivo, Mercado Pago, producto más vendido y nº de clientes.
 - **Gráfico de ventas del mes**: barras por día con total mensual y mejor día.
 - **Historial** por fecha y exportación a **CSV** y **PDF**.
 - **Base de datos compartida en la nube** (Supabase) con sincronización en tiempo real.
@@ -29,6 +32,9 @@ pastelería **Quita Penas**. Funciona en celular y en computadora, con los datos
 2. En el menú **SQL Editor** → **New query**, pegá el contenido de
    [`supabase/schema.sql`](supabase/schema.sql) y apretá **Run**.
    Esto crea las tablas, los permisos, el tiempo real y carga los productos iniciales.
+   > Si ya tenías la base creada de antes, **volvé a correr** este script: agrega
+   > la columna `cliente_id` necesaria para agrupar las ventas por cliente (es seguro,
+   > no borra datos).
 3. En **Project Settings → API** copiá:
    - **Project URL** (algo como `https://xxxx.supabase.co`)
    - **anon public key**

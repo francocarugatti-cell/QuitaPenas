@@ -20,14 +20,14 @@ export default function DaySummary({ ventas }) {
         <span className="resumen__icono">💵</span>
         <span className="resumen__label">Efectivo</span>
         <span className="resumen__valor">{formatMoney(r.efectivo)}</span>
-        <span className="resumen__detalle">{r.efectivoCount} transacciones</span>
+        <span className="resumen__detalle">{r.efectivoCount} {r.efectivoCount === 1 ? 'cliente' : 'clientes'}</span>
       </div>
 
       <div className="card resumen__card">
         <span className="resumen__icono">📱</span>
         <span className="resumen__label">Mercado Pago</span>
         <span className="resumen__valor">{formatMoney(r.mercadoPago)}</span>
-        <span className="resumen__detalle">{r.mercadoPagoCount} transacciones</span>
+        <span className="resumen__detalle">{r.mercadoPagoCount} {r.mercadoPagoCount === 1 ? 'cliente' : 'clientes'}</span>
       </div>
 
       <div className="card resumen__card">
@@ -42,9 +42,10 @@ export default function DaySummary({ ventas }) {
       </div>
 
       <div className="card resumen__card">
-        <span className="resumen__icono">🧮</span>
-        <span className="resumen__label">Transacciones</span>
-        <span className="resumen__valor">{r.transacciones}</span>
+        <span className="resumen__icono">👥</span>
+        <span className="resumen__label">Clientes del día</span>
+        <span className="resumen__valor">{r.clientes}</span>
+        <span className="resumen__detalle">{r.productosVendidos} productos vendidos</span>
       </div>
     </section>
   )
