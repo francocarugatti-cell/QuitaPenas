@@ -100,32 +100,6 @@ export default function SaleForm({ productos, onRegistrar }) {
     <div className="card form">
       <h2 className="card__title">🧺 Cargar cliente</h2>
 
-      {/* --- Productos ya agregados al cliente --- */}
-      {items.length > 0 ? (
-        <ul className="carrito">
-          {items.map((it) => (
-            <li key={it.id} className="carrito__item">
-              <span className="carrito__cant">{it.cantidad}×</span>
-              <span className="carrito__nombre">{it.producto}</span>
-              <span className="carrito__total">{formatMoney(it.total)}</span>
-              <button
-                type="button"
-                className="btn btn--icono btn--peligro"
-                onClick={() => quitarItem(it.id)}
-                aria-label={`Quitar ${it.producto}`}
-                title="Quitar"
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="carrito__vacio">
-          Agregá los productos que lleva este cliente y después cobrá todo junto.
-        </p>
-      )}
-
       {/* --- Agregar un producto al cliente --- */}
       <form className="form" onSubmit={agregarItem} noValidate>
         <div className="form__group">
@@ -220,6 +194,32 @@ export default function SaleForm({ productos, onRegistrar }) {
           onChange={(e) => setFecha(e.target.value)}
         />
       </div>
+
+      {/* --- Productos ya agregados al cliente --- */}
+      {items.length > 0 ? (
+        <ul className="carrito">
+          {items.map((it) => (
+            <li key={it.id} className="carrito__item">
+              <span className="carrito__cant">{it.cantidad}×</span>
+              <span className="carrito__nombre">{it.producto}</span>
+              <span className="carrito__total">{formatMoney(it.total)}</span>
+              <button
+                type="button"
+                className="btn btn--icono btn--peligro"
+                onClick={() => quitarItem(it.id)}
+                aria-label={`Quitar ${it.producto}`}
+                title="Quitar"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="carrito__vacio">
+          Agregá los productos que lleva este cliente y después cobrá todo junto.
+        </p>
+      )}
 
       {/* --- Total y cobro --- */}
       <div className="carrito__cobro">
