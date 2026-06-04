@@ -606,6 +606,189 @@ html, body {
   color: #1d4ed8;
 }
 
+/* ===== Carrito (productos del cliente actual) ===== */
+.carrito {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.carrito__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--crema);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  animation: aparecer 0.25s ease;
+}
+
+.carrito__cant {
+  font-weight: 700;
+  color: var(--naranja-osc);
+  min-width: 32px;
+}
+
+.carrito__nombre {
+  flex: 1;
+  font-weight: 500;
+  color: var(--marron);
+}
+
+.carrito__total {
+  font-weight: 700;
+  color: var(--marron);
+}
+
+.carrito__vacio {
+  font-size: 14px;
+  color: var(--texto-suave);
+  background: var(--crema-2);
+  padding: 12px 14px;
+  border-radius: var(--radio-sm);
+  line-height: 1.5;
+}
+
+.carrito__cobro {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--borde);
+}
+
+.carrito__cobro-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.carrito__cobro-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--marron-claro);
+}
+
+.carrito__cobro-valor {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--naranja-osc);
+}
+
+/* ===== Lista de clientes (ventas agrupadas) ===== */
+.clientes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cliente {
+  padding: 0;
+  overflow: hidden;
+  animation: aparecer 0.3s ease;
+}
+
+.cliente__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--crema-2);
+  border-bottom: 1px solid var(--borde);
+}
+
+.cliente__titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cliente__num {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--marron);
+}
+
+.cliente__hora {
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.cliente__acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cliente__items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.cliente__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--borde);
+  font-size: 14px;
+}
+
+.cliente__item:first-child {
+  border-top: none;
+}
+
+.cliente__cant {
+  font-weight: 700;
+  color: var(--naranja-osc);
+  min-width: 32px;
+}
+
+.cliente__producto {
+  flex: 1;
+  font-weight: 500;
+  color: var(--marron);
+}
+
+.cliente__precio {
+  font-size: 12.5px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.cliente__subtotal {
+  font-weight: 600;
+  color: var(--marron);
+  min-width: 80px;
+  text-align: right;
+}
+
+.cliente__pie {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--crema);
+  border-top: 1px solid var(--borde);
+}
+
+.cliente__pie-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--marron-claro);
+}
+
+.cliente__pie-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--naranja-osc);
+}
+
 /* ===== Historial ===== */
 .historial {
   background: var(--blanco);

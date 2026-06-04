@@ -88,25 +88,31 @@ function AppConectada({ onLogout }) {
   }
 
   // ----- Operaciones sobre ventas -----
-  async function registrarVenta(venta) {
-    const { error } = await supabase.from('ventas').insert(venta)
+  // Registra un cliente: todos sus productos comparten un mismo "ticket".
+  async function registrarCliente({ items, metodo, fecha }) {
+    if (!items || items.length === 0) return
+    const ticket = crypto.randomUUID()
+    const filas = items.map((it) => ({ ...it, metodo, fecha, ticket }))
+
+    const { error } = await supabase.from('ventas').insert(filas)
     if (error) {
-      mostrarToast('❌ No se pudo registrar la venta', 'error')
+      mostrarToast('❌ No se pudo registrar el cliente', 'error')
       return
     }
     await recargarVentas()
-    mostrarToast('✅ Venta registrada correctamente')
+    mostrarToast('✅ Cliente registrado correctamente')
   }
 
   async function confirmarEliminar() {
-    const { error } = await supabase.from('ventas').delete().eq('id', aEliminar)
+    // aEliminar es la lista de ids de los productos del cliente.
+    const { error } = await supabase.from('ventas').delete().in('id', aEliminar)
     setAEliminar(null)
     if (error) {
       mostrarToast('❌ No se pudo eliminar', 'error')
       return
     }
     await recargarVentas()
-    mostrarToast('🗑️ Venta eliminada', 'error')
+    mostrarToast('🗑️ Cliente eliminado', 'error')
   }
 
   // ----- Operaciones sobre productos -----
@@ -150,10 +156,10 @@ function AppConectada({ onLogout }) {
         <div className="contenido">
           {vista === 'ventas' && (
             <>
-              <SaleForm productos={productos} onRegistrar={registrarVenta} />
+              <SaleForm productos={productos} onRegistrar={registrarCliente} />
               <section>
-                <h2 className="seccion__titulo">🧾 Ventas de hoy</h2>
-                <SalesTable ventas={ventasHoy} onEliminar={(id) => setAEliminar(id)} />
+                <h2 className="seccion__titulo">🧾 Clientes de hoy</h2>
+                <SalesTable ventas={ventasHoy} onEliminar={(ids) => setAEliminar(ids)} />
               </section>
             </>
           )}
@@ -189,7 +195,7 @@ function AppConectada({ onLogout }) {
 
       {aEliminar && (
         <ConfirmDialog
-          mensaje="¿Seguro que querés eliminar esta venta? Esta acción no se puede deshacer."
+          mensaje="¿Seguro que querés eliminar este cliente y todos sus productos? Esta acción no se puede deshacer."
           onConfirmar={confirmarEliminar}
           onCancelar={() => setAEliminar(null)}
         />

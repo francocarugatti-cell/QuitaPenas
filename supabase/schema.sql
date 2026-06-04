@@ -17,8 +17,11 @@ create table if not exists productos (
 );
 
 -- ---------- Tabla de ventas ----------
+-- Cada fila es un producto vendido. Las filas con el mismo "ticket"
+-- pertenecen al mismo cliente (una compra puede llevar varios productos).
 create table if not exists ventas (
   id        uuid primary key default gen_random_uuid(),
+  ticket    uuid,
   producto  text not null,
   cantidad  numeric not null,
   precio    numeric not null,
@@ -27,6 +30,9 @@ create table if not exists ventas (
   fecha     timestamptz not null default now(),
   creado_en timestamptz not null default now()
 );
+
+-- Si la tabla ya existía de una versión anterior, agrega la columna "ticket".
+alter table ventas add column if not exists ticket uuid;
 
 -- ---------- Seguridad (Row Level Security) ----------
 -- Se habilita RLS y se permite acceso con la clave pública (anon key).

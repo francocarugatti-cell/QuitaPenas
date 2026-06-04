@@ -1,5 +1,6 @@
 // Exportación de ventas a CSV sin librerías externas.
 import { formatHora } from './format.js'
+import { agruparPorCliente } from './resumen.js'
 
 /** Escapa un valor para CSV (comillas y separadores). */
 function escaparCampo(valor) {
@@ -16,16 +17,20 @@ function escaparCampo(valor) {
  * @param {string} clave  Clave del día (YYYY-MM-DD) para el nombre del archivo.
  */
 export function descargarCSV(ventas, clave) {
-  const cabecera = ['Hora', 'Producto', 'Cantidad', 'Precio unitario', 'Total', 'Método de pago']
+  const cabecera = ['Cliente', 'Hora', 'Producto', 'Cantidad', 'Precio unitario', 'Total', 'Método de pago']
 
-  const filas = ventas.map((v) => [
-    formatHora(v.fecha),
-    v.producto,
-    v.cantidad,
-    v.precio.toFixed(2),
-    v.total.toFixed(2),
-    v.metodo,
-  ])
+  // Una fila por producto, con el número de cliente al que pertenece.
+  const filas = agruparPorCliente(ventas).flatMap((c) =>
+    c.items.map((v) => [
+      `Cliente ${c.numero}`,
+      formatHora(v.fecha),
+      v.producto,
+      v.cantidad,
+      v.precio.toFixed(2),
+      v.total.toFixed(2),
+      v.metodo,
+    ]),
+  )
 
   // Separador ";" y coma decimal funcionan mejor con Excel en español.
   const contenido = [cabecera, ...filas]
