@@ -16,6 +16,7 @@ export function agruparPorCliente(ventas) {
     if (!cliente) {
       cliente = {
         ticket: clave,
+        nombre: v.cliente || null,
         items: [],
         ids: [],
         total: 0,

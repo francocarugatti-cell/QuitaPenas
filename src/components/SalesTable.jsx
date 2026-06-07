@@ -26,7 +26,9 @@ export default function SalesTable({ ventas, onEliminar }) {
         <article key={c.ticket} className="card cliente">
           <header className="cliente__cabecera">
             <div className="cliente__titulo">
-              <span className="cliente__num">Cliente #{c.numero}</span>
+              <span className="cliente__num">
+                {c.nombre ? `👤 ${c.nombre}` : `Cliente #${c.numero}`}
+              </span>
               <span className="cliente__hora">🕒 {formatHora(c.fecha)}</span>
             </div>
             <div className="cliente__acciones">

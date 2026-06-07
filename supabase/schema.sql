@@ -9,19 +9,27 @@
 -- ============================================================
 
 -- ---------- Tabla de productos ----------
+-- "canal" identifica a qué negocio pertenece: panadería (tienda física),
+-- comercio (ventas a comercio) o pasteleria (ventas pastelería).
 create table if not exists productos (
   id        uuid primary key default gen_random_uuid(),
+  canal     text not null default 'panaderia',
   nombre    text not null,
   precio    numeric not null default 0,
   creado_en timestamptz not null default now()
 );
+
+-- Si la tabla ya existía de una versión anterior, agrega la columna "canal".
+alter table productos add column if not exists canal text not null default 'panaderia';
 
 -- ---------- Tabla de ventas ----------
 -- Cada fila es un producto vendido. Las filas con el mismo "ticket"
 -- pertenecen al mismo cliente (una compra puede llevar varios productos).
 create table if not exists ventas (
   id        uuid primary key default gen_random_uuid(),
+  canal     text not null default 'panaderia',
   ticket    uuid,
+  cliente   text,
   producto  text not null,
   cantidad  numeric not null,
   precio    numeric not null,
@@ -31,8 +39,10 @@ create table if not exists ventas (
   creado_en timestamptz not null default now()
 );
 
--- Si la tabla ya existía de una versión anterior, agrega la columna "ticket".
+-- Si la tabla ya existía de una versión anterior, agrega las columnas nuevas.
 alter table ventas add column if not exists ticket uuid;
+alter table ventas add column if not exists canal text not null default 'panaderia';
+alter table ventas add column if not exists cliente text;
 
 -- ---------- Seguridad (Row Level Security) ----------
 -- Se habilita RLS y se permite acceso con la clave pública (anon key).

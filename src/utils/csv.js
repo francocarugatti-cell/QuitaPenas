@@ -22,7 +22,7 @@ export function descargarCSV(ventas, clave) {
   // Una fila por producto, con el número de cliente al que pertenece.
   const filas = agruparPorCliente(ventas).flatMap((c) =>
     c.items.map((v) => [
-      `Cliente ${c.numero}`,
+      c.nombre || `Cliente ${c.numero}`,
       formatHora(v.fecha),
       v.producto,
       v.cantidad,

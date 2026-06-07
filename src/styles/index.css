@@ -23,6 +23,11 @@
   --texto: #3b2415;
   --texto-suave: #8a6f5a;
 
+  /* Resplandor de acento (cambia según el negocio) */
+  --glow: rgba(234, 88, 12, 0.35);
+  --glow-fuerte: rgba(234, 88, 12, 0.45);
+  --glow-suave: rgba(234, 88, 12, 0.14);
+
   /* Sombra y radios */
   --sombra: 0 4px 16px rgba(120, 72, 30, 0.10);
   --sombra-fuerte: 0 8px 28px rgba(120, 72, 30, 0.18);
@@ -30,6 +35,35 @@
   --radio-sm: 10px;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ===== Temas de color por negocio =====
+   Cada negocio cambia su color de acento (barra superior, botones, focos). */
+.tema-panaderia {
+  --naranja: #9a6b43;
+  --naranja-osc: #74492a;
+  --dorado: #c79a6b;
+  --glow: rgba(154, 107, 67, 0.38);
+  --glow-fuerte: rgba(154, 107, 67, 0.5);
+  --glow-suave: rgba(154, 107, 67, 0.16);
+}
+
+.tema-comercio {
+  --naranja: #0e9aa7;
+  --naranja-osc: #0c7d88;
+  --dorado: #2fc6d4;
+  --glow: rgba(14, 154, 167, 0.38);
+  --glow-fuerte: rgba(14, 154, 167, 0.5);
+  --glow-suave: rgba(14, 154, 167, 0.16);
+}
+
+.tema-pasteleria {
+  --naranja: #db2777;
+  --naranja-osc: #be185d;
+  --dorado: #f472b6;
+  --glow: rgba(219, 39, 119, 0.38);
+  --glow-fuerte: rgba(219, 39, 119, 0.5);
+  --glow-suave: rgba(219, 39, 119, 0.16);
 }
 
 * {
@@ -111,10 +145,70 @@ html, body {
   white-space: nowrap;
 }
 
+/* Selector de negocio (panadería / comercio / pastelería) */
+.sidebar__negocios {
+  display: flex;
+  gap: 6px;
+  padding: 0 10px 8px;
+  overflow-x: auto;
+}
+
+.sidebar__negocio {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  min-height: 42px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radio-sm);
+  color: rgba(255, 248, 239, 0.8);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.sidebar__negocio:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--crema);
+}
+
+.sidebar__negocio.is-active {
+  background: linear-gradient(135deg, var(--naranja), var(--dorado));
+  border-color: transparent;
+  color: var(--blanco);
+  box-shadow: 0 4px 12px var(--glow);
+}
+
+.sidebar__negocio-icono {
+  font-size: 16px;
+}
+
+/* Botón del resumen general (junta los 3 negocios). */
+.sidebar__negocio--general {
+  border-style: dashed;
+  color: var(--dorado);
+}
+
+.sidebar__negocio--general.is-active {
+  background: linear-gradient(135deg, var(--marron-claro), var(--marron));
+  border-style: solid;
+  border-color: transparent;
+  color: var(--blanco);
+  box-shadow: 0 4px 12px rgba(58, 36, 21, 0.4);
+}
+
 .sidebar__nav {
   display: flex;
   gap: 4px;
-  padding: 0 10px 10px;
+  padding: 8px 10px 10px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
 }
 
@@ -253,6 +347,16 @@ html, body {
   box-shadow: var(--sombra);
 }
 
+.topbar__negocio {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 5px;
+}
+
 .topbar__titulo {
   font-size: 20px;
   font-weight: 700;
@@ -340,7 +444,7 @@ html, body {
 .form__control:focus {
   outline: none;
   border-color: var(--naranja);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+  box-shadow: 0 0 0 3px var(--glow-suave);
 }
 
 .form__control.is-error {
@@ -352,6 +456,12 @@ html, body {
   font-size: 12.5px;
   color: var(--rojo-osc);
   font-weight: 500;
+}
+
+.form__opcional {
+  font-weight: 400;
+  color: var(--texto-suave);
+  font-size: 12.5px;
 }
 
 /* Método de pago */
@@ -389,7 +499,7 @@ html, body {
   border-color: var(--naranja);
   background: var(--crema-2);
   color: var(--naranja-osc);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+  box-shadow: 0 0 0 3px var(--glow-suave);
 }
 
 /* ===== Botones ===== */
@@ -421,12 +531,12 @@ html, body {
 .btn--primary {
   background: linear-gradient(135deg, var(--naranja), var(--dorado));
   color: var(--blanco);
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  box-shadow: 0 4px 12px var(--glow);
   font-size: 17px;
 }
 
 .btn--primary:hover {
-  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.45);
+  box-shadow: 0 6px 18px var(--glow-fuerte);
 }
 
 .btn--secundario {
@@ -518,6 +628,65 @@ html, body {
 .resumen__detalle {
   font-size: 12.5px;
   color: var(--texto-suave);
+}
+
+.resumen__detalle--claro {
+  color: rgba(255, 248, 239, 0.85);
+}
+
+/* ===== Resumen general (los 3 negocios) ===== */
+.general {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.general__controles {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.general__rango {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Selector "Un día" / "Rango de fechas" */
+.periodo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.periodo__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px;
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  background: var(--crema);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--marron-claro);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.periodo__btn:hover {
+  background: var(--crema-2);
+}
+
+.periodo__btn.is-active {
+  border-color: var(--naranja);
+  background: var(--crema-2);
+  color: var(--naranja-osc);
+  box-shadow: 0 0 0 3px var(--glow-suave);
 }
 
 /* ===== Tabla ===== */
@@ -1238,10 +1407,22 @@ html, body {
     font-size: 18px;
   }
 
+  .sidebar__negocios {
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 14px 12px;
+    overflow-x: visible;
+  }
+
+  .sidebar__negocio {
+    justify-content: flex-start;
+    font-size: 14px;
+  }
+
   .sidebar__nav {
     flex-direction: column;
     gap: 6px;
-    padding: 8px 14px;
+    padding: 12px 14px 8px;
     overflow-x: visible;
   }
 

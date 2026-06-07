@@ -13,12 +13,14 @@ function itemInicial() {
 /**
  * Formulario de registro de venta por cliente (carrito).
  * Se agregan varios productos a un mismo cliente y al final se cobra todo junto.
- * @param {Array} productos     Lista de productos disponibles { id, nombre, precio }.
- * @param {Function} onRegistrar Recibe { items, metodo, fecha } del cliente a guardar.
+ * @param {Array} productos      Lista de productos disponibles { id, nombre, precio }.
+ * @param {Function} onRegistrar Recibe { items, metodo, fecha, cliente } del cliente a guardar.
+ * @param {boolean} conNombre    Si es true, muestra el campo para el nombre del cliente.
  */
-export default function SaleForm({ productos, onRegistrar }) {
+export default function SaleForm({ productos, onRegistrar, conNombre = false }) {
   const [item, setItem] = useState(itemInicial)
   const [items, setItems] = useState([]) // Productos del cliente actual.
+  const [nombre, setNombre] = useState('') // Nombre del cliente (comercio / pastelería).
   const [metodo, setMetodo] = useState('Efectivo')
   const [fecha, setFecha] = useState(() => toDatetimeLocal(new Date()))
   const [errores, setErrores] = useState({})
@@ -88,10 +90,12 @@ export default function SaleForm({ productos, onRegistrar }) {
       })),
       metodo,
       fecha: new Date(fecha).toISOString(),
+      cliente: conNombre ? nombre.trim() || null : null,
     })
     // Reinicia para el siguiente cliente.
     setItems([])
     setItem(itemInicial())
+    setNombre('')
     setMetodo('Efectivo')
     setFecha(toDatetimeLocal(new Date()))
   }
@@ -99,6 +103,23 @@ export default function SaleForm({ productos, onRegistrar }) {
   return (
     <div className="card form">
       <h2 className="card__title">🧺 Cargar cliente</h2>
+
+      {/* --- Nombre del cliente (solo comercio / pastelería) --- */}
+      {conNombre && (
+        <div className="form__group">
+          <label className="form__label" htmlFor="nombre-cliente">
+            Nombre del cliente <span className="form__opcional">(opcional)</span>
+          </label>
+          <input
+            id="nombre-cliente"
+            type="text"
+            className="form__control"
+            placeholder="Ej: Kiosco San Martín"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
+        </div>
+      )}
 
       {/* --- Agregar un producto al cliente --- */}
       <form className="form" onSubmit={agregarItem} noValidate>

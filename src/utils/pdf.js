@@ -47,7 +47,7 @@ export function descargarPDF(ventas, clave) {
   // --- Tabla de ventas (agrupada por cliente) ---
   const cuerpo = agruparPorCliente(ventas).flatMap((c) =>
     c.items.map((v) => [
-      `Cliente ${c.numero}`,
+      c.nombre || `Cliente ${c.numero}`,
       formatHora(v.fecha),
       v.producto,
       String(v.cantidad),

@@ -5,6 +5,7 @@ import DaySummary from './components/DaySummary.jsx'
 import SalesTable from './components/SalesTable.jsx'
 import MonthlyChart from './components/MonthlyChart.jsx'
 import History from './components/History.jsx'
+import GeneralSummary from './components/GeneralSummary.jsx'
 import ProductManager from './components/ProductManager.jsx'
 import Toast from './components/Toast.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
@@ -14,6 +15,7 @@ import { useCollection } from './hooks/useCollection.js'
 import { supabase, supabaseConfigurado } from './lib/supabase.js'
 import { todayKey, dateKey, formatFechaLarga, formatMoney } from './utils/format.js'
 import { calcularResumen } from './utils/resumen.js'
+import { NEGOCIO_DEFECTO, negocioPorId } from './utils/negocios.js'
 
 // Títulos que se muestran en la barra superior de cada vista.
 const TITULOS = {
@@ -23,6 +25,7 @@ const TITULOS = {
 }
 
 const CLAVE_SESION = 'qp_sesion'
+const CLAVE_NEGOCIO = 'qp_negocio'
 
 export default function App() {
   // Estado de sesión, recordado en el navegador.
@@ -68,15 +71,38 @@ function AppConectada({ onLogout }) {
     ascendente: true,
   })
 
+  // Negocio (canal) activo, recordado en el navegador.
+  const [negocio, setNegocio] = useState(
+    () => window.localStorage.getItem(CLAVE_NEGOCIO) || NEGOCIO_DEFECTO,
+  )
+  const [general, setGeneral] = useState(false) // Resumen general (los 3 negocios).
   const [vista, setVista] = useState('ventas')
   const [toast, setToast] = useState(null)
   const [aEliminar, setAEliminar] = useState(null)
 
-  // Ventas de hoy.
+  // Elegir un negocio sale del resumen general.
+  function cambiarNegocio(id) {
+    window.localStorage.setItem(CLAVE_NEGOCIO, id)
+    setNegocio(id)
+    setGeneral(false)
+  }
+
+  // Solo los productos y ventas del negocio activo (las filas viejas sin
+  // canal se consideran de la panadería).
+  const productosCanal = useMemo(
+    () => productos.filter((p) => (p.canal || NEGOCIO_DEFECTO) === negocio),
+    [productos, negocio],
+  )
+  const ventasCanal = useMemo(
+    () => ventas.filter((v) => (v.canal || NEGOCIO_DEFECTO) === negocio),
+    [ventas, negocio],
+  )
+
+  // Ventas de hoy (del negocio activo).
   const ventasHoy = useMemo(() => {
     const hoy = todayKey()
-    return ventas.filter((v) => dateKey(v.fecha) === hoy)
-  }, [ventas])
+    return ventasCanal.filter((v) => dateKey(v.fecha) === hoy)
+  }, [ventasCanal])
 
   const totalHoy = useMemo(() => calcularResumen(ventasHoy).total, [ventasHoy])
 
@@ -89,14 +115,15 @@ function AppConectada({ onLogout }) {
 
   // ----- Operaciones sobre ventas -----
   // Registra un cliente: todos sus productos comparten un mismo "ticket".
-  async function registrarCliente({ items, metodo, fecha }) {
+  async function registrarCliente({ items, metodo, fecha, cliente }) {
     if (!items || items.length === 0) return
     const ticket = crypto.randomUUID()
-    const filas = items.map((it) => ({ ...it, metodo, fecha, ticket }))
+    const filas = items.map((it) => ({ ...it, metodo, fecha, ticket, cliente, canal: negocio }))
 
     const { error } = await supabase.from('ventas').insert(filas)
     if (error) {
-      mostrarToast('❌ No se pudo registrar el cliente', 'error')
+      console.error('Error al registrar cliente:', error)
+      mostrarToast(`❌ ${error.message}`, 'error')
       return
     }
     await recargarVentas()
@@ -117,8 +144,11 @@ function AppConectada({ onLogout }) {
 
   // ----- Operaciones sobre productos -----
   async function agregarProducto(nombre, precio) {
-    const { error } = await supabase.from('productos').insert({ nombre, precio })
-    if (error) return mostrarToast('❌ No se pudo agregar el producto', 'error')
+    const { error } = await supabase.from('productos').insert({ nombre, precio, canal: negocio })
+    if (error) {
+      console.error('Error al agregar producto:', error)
+      return mostrarToast(`❌ ${error.message}`, 'error')
+    }
     await recargarProductos()
     mostrarToast('✅ Producto agregado')
   }
@@ -137,26 +167,49 @@ function AppConectada({ onLogout }) {
     mostrarToast('🗑️ Producto borrado', 'error')
   }
 
+  const datosNegocio = negocioPorId(negocio)
+
   return (
-    <div className="layout">
-      <Sidebar vista={vista} setVista={setVista} onLogout={onLogout} />
+    <div className={`layout tema-${negocio}`}>
+      <Sidebar
+        negocio={negocio}
+        setNegocio={cambiarNegocio}
+        general={general}
+        setGeneral={() => setGeneral(true)}
+        vista={vista}
+        setVista={setVista}
+        onLogout={onLogout}
+      />
 
       <main className="main">
         <div className="topbar">
           <div className="topbar__info">
-            <h1 className="topbar__titulo">{TITULOS[vista]}</h1>
+            <span className="topbar__negocio">
+              {general ? '📈 Todos los negocios' : `${datosNegocio.icono} ${datosNegocio.label}`}
+            </span>
+            <h1 className="topbar__titulo">
+              {general ? 'Resumen general' : TITULOS[vista]}
+            </h1>
             <p className="topbar__fecha">{formatFechaLarga(new Date())}</p>
           </div>
-          <div className="topbar__total">
-            <span className="topbar__total-label">Total de hoy</span>
-            <span className="topbar__total-valor">{formatMoney(totalHoy)}</span>
-          </div>
+          {!general && (
+            <div className="topbar__total">
+              <span className="topbar__total-label">Total de hoy</span>
+              <span className="topbar__total-valor">{formatMoney(totalHoy)}</span>
+            </div>
+          )}
         </div>
 
         <div className="contenido">
-          {vista === 'ventas' && (
+          {general && <GeneralSummary ventas={ventas} />}
+
+          {!general && vista === 'ventas' && (
             <>
-              <SaleForm productos={productos} onRegistrar={registrarCliente} />
+              <SaleForm
+                productos={productosCanal}
+                onRegistrar={registrarCliente}
+                conNombre={negocio !== NEGOCIO_DEFECTO}
+              />
               <section>
                 <h2 className="seccion__titulo">🧾 Clientes de hoy</h2>
                 <SalesTable ventas={ventasHoy} onEliminar={(ids) => setAEliminar(ids)} />
@@ -164,9 +217,9 @@ function AppConectada({ onLogout }) {
             </>
           )}
 
-          {vista === 'productos' && (
+          {!general && vista === 'productos' && (
             <ProductManager
-              productos={productos}
+              productos={productosCanal}
               onAgregar={agregarProducto}
               onCambiarPrecio={cambiarPrecioProducto}
               onBorrar={borrarProducto}
@@ -174,14 +227,14 @@ function AppConectada({ onLogout }) {
             />
           )}
 
-          {vista === 'resumen' && (
+          {!general && vista === 'resumen' && (
             <>
               <section>
                 <h2 className="seccion__titulo">💰 Resumen de hoy</h2>
                 <DaySummary ventas={ventasHoy} />
               </section>
-              <MonthlyChart ventas={ventas} />
-              <History ventas={ventas} />
+              <MonthlyChart ventas={ventasCanal} />
+              <History ventas={ventasCanal} />
             </>
           )}
 
