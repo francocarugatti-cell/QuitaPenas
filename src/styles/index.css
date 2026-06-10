@@ -753,6 +753,73 @@ html, body {
   opacity: 0.6;
 }
 
+/* Pie de tabla (totales) */
+.tabla tfoot th {
+  text-align: left;
+  background: var(--crema-2);
+  border-top: 2px solid var(--borde);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--marron);
+  position: static;
+}
+
+/* Selector de período de "Ventas por producto" */
+.periodo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.periodo .btn--secundario.is-activo {
+  background: var(--naranja);
+  border-color: var(--naranja);
+  color: #fff;
+}
+
+.periodo__fechas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.periodo__fechas .form__group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.periodo__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.periodo__desc {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--naranja-osc);
+  text-transform: capitalize;
+}
+
+.general__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.general__cabecera .seccion__titulo {
+  margin: 0;
+}
+
 /* Badge de método de pago */
 .badge {
   display: inline-flex;

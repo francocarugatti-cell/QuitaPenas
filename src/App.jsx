@@ -4,6 +4,7 @@ import SaleForm from './components/SaleForm.jsx'
 import DaySummary from './components/DaySummary.jsx'
 import SalesTable from './components/SalesTable.jsx'
 import MonthlyChart from './components/MonthlyChart.jsx'
+import ProductSales from './components/ProductSales.jsx'
 import History from './components/History.jsx'
 import GeneralSummary from './components/GeneralSummary.jsx'
 import ProductManager from './components/ProductManager.jsx'
@@ -233,6 +234,7 @@ function AppConectada({ onLogout }) {
                 <h2 className="seccion__titulo">💰 Resumen de hoy</h2>
                 <DaySummary ventas={ventasHoy} />
               </section>
+              <ProductSales ventas={ventasCanal} />
               <MonthlyChart ventas={ventasCanal} />
               <History ventas={ventasCanal} />
             </>

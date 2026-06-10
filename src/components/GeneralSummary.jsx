@@ -6,7 +6,7 @@ import {
   formatFechaLarga,
   formatMoney,
 } from '../utils/format.js'
-import { calcularResumen } from '../utils/resumen.js'
+import { calcularResumen, ventasPorProducto } from '../utils/resumen.js'
 
 /**
  * Resumen general: junta las ventas de los 3 negocios en una sola página.
@@ -31,17 +31,49 @@ export default function GeneralSummary({ ventas }) {
     return k >= ini && k <= fin
   }
 
-  // Totales de cada negocio en el período.
+  // Todas las ventas del período (de los 3 negocios juntos).
+  const ventasPeriodo = ventas.filter(enPeriodo)
+
+  // Totales y productos de cada negocio en el período.
   const porNegocio = NEGOCIOS.map((n) => {
-    const filtradas = ventas.filter(
-      (v) => (v.canal || NEGOCIO_DEFECTO) === n.id && enPeriodo(v),
+    const filtradas = ventasPeriodo.filter(
+      (v) => (v.canal || NEGOCIO_DEFECTO) === n.id,
     )
     const r = calcularResumen(filtradas)
-    return { ...n, total: r.total, clientes: r.clientes }
+    const productos = ventasPorProducto(filtradas)
+    const totalesProductos = productos.reduce(
+      (acc, p) => ({ unidades: acc.unidades + p.unidades, total: acc.total + p.total }),
+      { unidades: 0, total: 0 },
+    )
+    return {
+      ...n,
+      total: r.total,
+      efectivo: r.efectivo,
+      mercadoPago: r.mercadoPago,
+      clientes: r.clientes,
+      productos,
+      totalesProductos,
+    }
   })
 
   const totalGeneral = porNegocio.reduce((a, x) => a + x.total, 0)
   const clientesGeneral = porNegocio.reduce((a, x) => a + x.clientes, 0)
+
+  async function exportarPDF() {
+    if (ventasPeriodo.length === 0) return
+    const { descargarPDFGeneral } = await import('../utils/pdf.js')
+    descargarPDFGeneral({
+      titulo: tituloPeriodo,
+      nombreArchivo: ini === fin ? ini : `${ini}_a_${fin}`,
+      negocios: porNegocio,
+      totalesNegocios: {
+        total: totalGeneral,
+        efectivo: porNegocio.reduce((a, x) => a + x.efectivo, 0),
+        mercadoPago: porNegocio.reduce((a, x) => a + x.mercadoPago, 0),
+        clientes: clientesGeneral,
+      },
+    })
+  }
 
   const tituloPeriodo =
     modo === 'dia'
@@ -111,7 +143,16 @@ export default function GeneralSummary({ ventas }) {
 
       {/* ----- Resultados del período ----- */}
       <section>
-        <h2 className="seccion__titulo">💰 {tituloPeriodo}</h2>
+        <div className="general__cabecera">
+          <h2 className="seccion__titulo">💰 {tituloPeriodo}</h2>
+          <button
+            className="btn btn--secundario"
+            onClick={exportarPDF}
+            disabled={ventasPeriodo.length === 0}
+          >
+            📄 Exportar PDF
+          </button>
+        </div>
         <div className="resumen">
           <div className="card resumen__card resumen__card--total">
             <span className="resumen__icono">💰</span>

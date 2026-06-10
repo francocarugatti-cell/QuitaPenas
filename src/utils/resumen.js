@@ -42,6 +42,27 @@ export function agruparPorCliente(ventas) {
 }
 
 /**
+ * Agrupa las ventas por producto y suma unidades y dinero de cada uno.
+ * @param {Array} ventas Lista de ventas (filas de producto), ya filtradas por período.
+ * @returns {Array} Productos ordenados por unidades vendidas (de mayor a menor).
+ */
+export function ventasPorProducto(ventas) {
+  const mapa = new Map()
+
+  for (const v of ventas) {
+    let p = mapa.get(v.producto)
+    if (!p) {
+      p = { producto: v.producto, unidades: 0, total: 0 }
+      mapa.set(v.producto, p)
+    }
+    p.unidades += v.cantidad
+    p.total += v.total
+  }
+
+  return [...mapa.values()].sort((a, b) => b.unidades - a.unidades)
+}
+
+/**
  * Calcula totales, desglose por método de pago, producto más vendido y
  * cantidad de clientes. Los métodos se cuentan por cliente, no por producto.
  * @param {Array} ventas Lista de ventas (ya filtradas por día).

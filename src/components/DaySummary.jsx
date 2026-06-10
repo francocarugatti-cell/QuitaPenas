@@ -31,17 +31,6 @@ export default function DaySummary({ ventas }) {
       </div>
 
       <div className="card resumen__card">
-        <span className="resumen__icono">⭐</span>
-        <span className="resumen__label">Más vendido</span>
-        <span className="resumen__valor resumen__valor--texto">
-          {r.productoTop || '—'}
-        </span>
-        <span className="resumen__detalle">
-          {r.productoTop ? `${r.productoTopUnidades} unidades` : 'Sin datos'}
-        </span>
-      </div>
-
-      <div className="card resumen__card">
         <span className="resumen__icono">👥</span>
         <span className="resumen__label">Clientes del día</span>
         <span className="resumen__valor">{r.clientes}</span>
